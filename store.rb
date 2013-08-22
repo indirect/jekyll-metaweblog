@@ -1,4 +1,4 @@
-require "post"
+require_relative "post"
 require "fileutils"
 
 class Store

@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'json'
 require 'xmlrpc/server'
-require 'store'
-require 'monkeypatch'
+require_relative 'store'
+require_relative 'monkeypatch'
 
 # not just the metaweblog API - this is _all_ the APIs crammed into one namespace. Ugly.
 
