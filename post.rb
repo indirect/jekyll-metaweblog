@@ -65,10 +65,6 @@ class Post
         # text editor.
         self.body = content.split(/---\s*\n/, 3)[2]
         
-        if not self.data["permalink"]
-            self.data["permalink"] = "/" + self.filename.gsub(/\/index\.\w+$/,"/")
-        end
-        
         return true
     end
 
@@ -78,18 +74,10 @@ class Post
         # (because the format type is the file extension).
 
         if self.type == :post
+            self.slug = self.title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '') + ".markdown"
             new_filename = sprintf("_posts/%04d-%02d-%02d-%s", self.date.year, self.date.month, self.date.day, self.slug)
         else
             new_filename = self.slug
-        end
-        
-        if self.data["permalink"]
-            pm = self.data["permalink"].gsub(/\/index\.\w+$/,"/")
-            new_pm = "/" + new_filename.gsub(/\/index\.\w+$/,"/")
-            if pm == new_pm
-                self.data["permalink"] = nil
-                self.data.delete("permalink")
-            end
         end
 
         # create surrounding folder.
@@ -139,6 +127,22 @@ class Post
     
     def tags=(t)
         self.data["tags"] = t
+    end
+
+    def photo
+      return self.data["photo"]
+    end
+
+    def photo=(p)
+      self.data["photo"] = p
+    end
+
+    def photoAltText
+      return self.data["photo-alt-text"]
+    end
+
+    def photoAltText=(p)
+      self.data["photo-alt-text"] = p
     end
     
 end

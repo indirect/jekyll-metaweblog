@@ -1,4 +1,4 @@
-require "post"
+require_relative "post"
 require "fileutils"
 
 class Store
@@ -26,6 +26,12 @@ class Store
         def walk(base, folder)
             #puts "walking #{ folder } under #{ base }"
             pages = []
+
+            # Don't browse the css folder: it makes call to getRecentPosts explode.
+            if folder == "/css"
+                return []
+            end
+            
             Dir.open(File.join(base,folder)).each{|file|
                 # drop . and ..
                 next if file.match(/^\.+$/)

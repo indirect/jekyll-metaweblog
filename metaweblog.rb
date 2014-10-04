@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'json'
 require 'xmlrpc/server'
-require 'store'
-require 'monkeypatch'
+require_relative 'store'
+require_relative 'monkeypatch'
 
 # not just the metaweblog API - this is _all_ the APIs crammed into one namespace. Ugly.
 
@@ -85,7 +85,11 @@ class MetaWeblog
     # return a custom post data structure. Can't just return eveything, because if the
     # client returns it all, it'll overwrite things like the title.
     def custom_fields(post)
-        return self.custom_field_names.map{|k| { :key => k, :value => post.data[k.to_s] ? post.data[k.to_s].to_s : "" } }
+        #return self.custom_field_names = {:tags => "test"}
+        test = self.custom_field_names.map{|k| { :key => k, :value => post.data[k.to_s] ? post.data[k.to_s].to_s : "" } }
+        test.insert(0, {:key => "photo", :value => post.photo ? post.photo : ""})
+        test.insert(1, {:key => "photo-alt-text", :value => post.photoAltText ? post.photoAltText : ""})
+        return test
     end
     
     
@@ -110,17 +114,14 @@ class MetaWeblog
             end
         end
 
-        # try not to destroy post tags if the client doens't send any tag information.
-        # otherwise, combine tags and keywords (clients aren't consistent). Will this
-        # make it hard to remove tags? Needs testing.
+        # As tags are available in the keywords field in MarsEdit
+        # discard the mt_tags field and replace its content
+        # by the content of mt_keywords.
         tags = nil
-        if data.include? "mt_tags"
-            tags ||= []
-            tags += data["mt_tags"].split(/\s*,\s*/)
-        end
         if data.include? "mt_keywords"
             tags ||= []
             tags += data["mt_keywords"].split(/\s*,\s*/)
+          data["mt_tags"] = tags
         end
         if not tags.nil?
             post.tags = tags.sort.uniq
@@ -165,7 +166,18 @@ class MetaWeblog
                 post.data[ field["key"] ] = field["value"]
             end
         end
-        
+
+        # Delete photo and photo-alt-text if they are empty
+        post.data.delete_if { |key, value| key == "photo" && value.strip.empty? }
+        post.data.delete_if { |key, value| key == "photo-alt-text" && value.strip.empty? }
+
+        # Change the kind (layout) of the post
+        if not post.photo.nil?
+          post.data["layout"] = "photo-post"
+        else
+          post.data["layout"] = "post"
+        end
+
     end
     
 
@@ -262,7 +274,14 @@ class MetaWeblog
         page = getPostOrDie(pageId)
         return page_response(page)
     end
-    
+
+    # required by the Wordpress API
+    # Somehow the posts are not displayed in MarsEdit...
+    def getPosts(blogId, user, password, limit, extra)
+      posts = store.posts[0,limit["number"]]
+      return posts.map{|p| post_response(p) }
+    end
+
     def getPages(blogId, user, pass, limit)
         pages = store.pages[0,limit]
         return pages.map{|p| page_response(p) }
