@@ -4,6 +4,7 @@ Tested with MarsEdit, System Other and Moveable Type API
 
 * Fix getRecentPosts call
 * Fix tag handling
+* Change slug generation
 * Handle photo custom fields (Jekyll photo-post layout)
 * Disable permalink
 
