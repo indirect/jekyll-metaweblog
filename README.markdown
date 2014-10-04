@@ -1,3 +1,14 @@
+## Last commit
+
+Tested with MarsEdit, System Other and Moveable Type API
+
+* Fix getRecentPosts call
+* Fix tag handling
+* Handle photo custom fields
+* Disable permalink
+
+----------------------------------------
+
 ## jekyll-metaweblog
 
 A stand-alone ruby/webrick server that will expose a Jekyll source folder via the Blogger / MT / Wordpress XML-RPC metaweblog interface, allowing you to create/edit/delete posts and pages using a GUI client, such as Marsedit.
