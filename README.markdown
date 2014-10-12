@@ -1,3 +1,9 @@
+## 2014-10-12
+
+* Add --git option true or false
+
+----------------------------------------
+
 ## Last commit
 
 Tested with MarsEdit, System Other and Moveable Type API
