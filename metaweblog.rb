@@ -350,7 +350,7 @@ def attach_metaweblog_methods(server, options)
     STDERR.puts("attaching with #{options.inspect}")
 
     store = Store.new(options[:root], options[:output])
-    store.git = true # TODO - make option
+    store.git = options[:git]
 
     # namespaces are for the WEAK
     metaWeblog = MetaWeblog.new(store, options[:host], options[:port], options[:password])

@@ -33,6 +33,11 @@ optparse = OptionParser.new do|opts|
         options[:web] = web
     end
 
+    options[:git] = false
+    opts.on( '-g', '--git BOOLEAN', 'Commit and push with Git' ) do |git|
+      options[:git] = !!git
+    end
+
     # This displays the help screen, all programs are
     # assumed to have this option.
     opts.on( '-h', '--help', 'Display this screen' ) do
