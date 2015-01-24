@@ -1,3 +1,10 @@
+## 2015-01-24
+
+* Fix --git option and text.
+Juste use --git to commit and push with git.
+
+----------------------------------------
+
 ## 2014-10-12
 
 * Add --git option true or false

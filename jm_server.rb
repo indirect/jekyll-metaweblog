@@ -34,8 +34,8 @@ optparse = OptionParser.new do|opts|
     end
 
     options[:git] = false
-    opts.on( '-g', '--git BOOLEAN', 'Commit and push with Git' ) do |git|
-      options[:git] = !!git
+    opts.on( '-g', '--git', 'Commit and push with Git' ) do |git|
+      options[:git] = true
     end
 
     # This displays the help screen, all programs are
