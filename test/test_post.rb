@@ -1,11 +1,12 @@
-require "test/unit"
-require 'store'
-require 'metaweblog'
+require "minitest/autorun"
 require "fileutils"
-require 'post'
+
+require_relative '../store'
+require_relative '../metaweblog'
+require_relative '../post'
 
 
-class TestPost < Test::Unit::TestCase
+class TestPost < Minitest::Test
 
     def setup
         @base = "_testdata"

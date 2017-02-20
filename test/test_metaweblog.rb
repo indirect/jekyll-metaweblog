@@ -1,11 +1,12 @@
-require "test/unit"
-require 'store'
-require 'metaweblog'
+require "minitest/autorun"
 require "fileutils"
-require 'post'
+
+require_relative '../store'
+require_relative '../metaweblog'
+require_relative '../post'
 
 
-class TestMetaWeblog < Test::Unit::TestCase
+class TestMetaWeblog < Minitest::Test
 
     def setup
         @base = "_testdata"
@@ -16,7 +17,7 @@ class TestMetaWeblog < Test::Unit::TestCase
 
         @store = Store.new(@base)
 
-        @meta = MetaWeblog.new(@store, "localhost", 4040)
+        @meta = MetaWeblog.new(@store, "localhost", 4040, "password")
 
         @blogId = 1
         @user = "user"
@@ -70,7 +71,7 @@ class TestMetaWeblog < Test::Unit::TestCase
 
     def test_getPost
         # can't get posts that don't exist
-        assert_raise( XMLRPC::FaultException, "can't get post that doesn't exist") {
+        assert_raises( XMLRPC::FaultException, "can't get post that doesn't exist") {
             post = @meta.getPost("id", @user, @pass)
         }
 
@@ -166,7 +167,6 @@ class TestMetaWeblog < Test::Unit::TestCase
 
 
 
-
     # MoveableType API
 
     def test_supportedTextFilters
@@ -224,7 +224,7 @@ class TestMetaWeblog < Test::Unit::TestCase
         page.tags = ["b", "c", "d"]
         @store.write(page)
 
-        tags = @meta.getTags(@blogId, @user, @pass)
+        tags = @meta.getTags(@blogId, @user, @pass).sort_by { |tag| tag[:tag_id] }
         assert_equal(4, tags.size)
         assert_equal(1, tags[0][:count])
         assert_equal(2, tags[1][:count])

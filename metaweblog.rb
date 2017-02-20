@@ -217,7 +217,8 @@ class MetaWeblog
     end
 
     def newPost(blogId, username, password, data, publish = true)
-        post = store.create(:post, nil, Date.today) # date is just default
+        slug = data['wp_slug'] + '.md' if data.include? 'wp_slug'
+        post = store.create(:post, slug, Date.today) # date is just default
         populate(post, data)
         store.write(post)
         return post.filename

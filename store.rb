@@ -104,7 +104,7 @@ class Store
 
     def commit(filename)
         Dir.chdir(self.base) do
-            IO.popen("git add \"#{File.join(self.base, filename)}\" && git commit -m \"jekyll-metaweblog commit\" && git pull --rebase && git push" ) { |io|
+            IO.popen("git add \"#{File.join(self.base, filename)}\"" ) { |io|
                 while (line = io.gets) do
                     STDERR.puts line
                 end
