@@ -6,7 +6,7 @@ require 'post'
 
 
 class TestPost < Test::Unit::TestCase
-    
+
     def setup
         @base = "_testdata"
         if File.directory? @base
@@ -14,7 +14,7 @@ class TestPost < Test::Unit::TestCase
         end
         FileUtils.mkdir_p @base
     end
-    
+
     def test_page
         page = Post.new(@base, "test_page.html")
         assert_equal(:page, page.type)
@@ -38,15 +38,15 @@ class TestPost < Test::Unit::TestCase
         assert_equal("foo", page2.data["foo"], "data is stored properly")
         assert_equal([1,2,3], page2.data["list"], "array data is stored properly")
         assert_equal(["a", "b", "c"], page2.tags, "page tags accessor works")
-        
+
         # rename the page and save again
         page.slug = "rename_page.html"
         page.write
-        
+
         assert_equal("rename_page.html", page.filename)
         assert(!File.exists?(File.join(@base, "test_page.html")), "old file has been removed")
         assert(File.exists?(File.join(@base, page.filename)), "new file now exists")
-        
+
         assert_match(/\(page\)/, page.to_s, "stringification contains page type")
         assert_match(/rename_page.html/, page.to_s, "stringification contains page filename")
 
@@ -72,24 +72,24 @@ class TestPost < Test::Unit::TestCase
         # rename the post and save again
         post.slug = "rename.html"
         post.write
-        
+
         assert(!File.exists?(File.join(@base, "_posts/2010-01-01-test.html")), "old post removed from disk")
         assert(File.exists?(File.join(@base, "_posts/2010-01-01-rename.html")), "new post written to disk")
 
     end
-    
+
     def test_invalid_file
         File.open(File.join(@base,"test.html"),"w"){|f|
             f.write("this is not YAML preamble")
         }
         page = Post.new(@base, "test.html")
         assert(!page.read, "can't read page without preamble")
-        
+
         File.open(File.join(@base,"zero.html"),"w"){|f|
         }
         page = Post.new(@base, "zero.html")
         assert(!page.read, "can't read zero-length file")
-        
+
     end
- 
+
 end

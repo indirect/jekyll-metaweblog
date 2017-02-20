@@ -3,21 +3,21 @@ require "fileutils"
 
 class Store
     attr_accessor :base, :posts, :output, :git
-  
+
     def initialize(base, output = nil)
         self.base = base
         self.output = output
         self.git = false
     end
-  
+
     def posts
         read_all_files.select{|p| p.type == :post }.sort_by{|p| p.date }.reverse
     end
-    
+
     def pages
         read_all_files.select{|p| p.type == :page }.sort_by{|p| p.filename }
     end
-  
+
     def read_all_files
         page_root = File.join(self.base)
 
@@ -32,7 +32,7 @@ class Store
 
                 # drop hidden files
                 next if file.match(/^[\.]/)
-                
+
                 # don't walk into any magic folders other than _posts
                 next if file.match(/^_/) and file != "_posts"
 
@@ -53,7 +53,7 @@ class Store
         pages = walk(page_root, "")
         return pages
     end
-  
+
     def get(filename)
         post = Post.new(self.base, filename)
         if post.read
@@ -61,7 +61,7 @@ class Store
         end
         return nil
     end
-    
+
     def delete(filename)
         if File.exists?(File.join(self.base, filename))
             File.delete(File.join(self.base, filename))
@@ -69,7 +69,7 @@ class Store
         end
         return false
     end
- 
+
     def write(post)
         post.write
         if self.git
@@ -88,8 +88,8 @@ class Store
             return Post.new(self.base, filename)
         end
     end
-    
-    
+
+
     def saveFile(name, data)
         filename = File.join(self.base, "uploads", name)
         if not File.directory?(File.dirname(filename))
@@ -100,18 +100,18 @@ class Store
         }
         return "uploads/#{name.gsub(/^\//,'')}"
     end
-    
-    
+
+
     def commit(filename)
         Dir.chdir(self.base) do
             IO.popen("git add \"#{File.join(self.base, filename)}\" && git commit -m \"jekyll-metaweblog commit\" && git pull --rebase && git push" ) { |io|
                 while (line = io.gets) do
                     STDERR.puts line
                 end
-            } 
+            }
         end
     end
-    
+
     # render the entire site through jekyll
     def render
         STDERR.puts("render to #{self.output}")
@@ -123,13 +123,13 @@ class Store
                 while (line = io.gets) do
                     STDERR.puts line
                 end
-            } 
-                
+            }
+
         end
         STDERR.puts("render complete")
     end
-  
+
 end
 
 
-  
+

@@ -2,11 +2,11 @@ require 'yaml'
 
 class Post
     attr_accessor :base, :filename, :date, :body, :data, :type, :slug
-    
+
     def initialize(base, filename)
         self.base = base
         self.filename = filename
-        
+
         self.slug = filename
         self.date = Date.today
         self.type = :page
@@ -24,15 +24,15 @@ class Post
             self.type = :post
         end
     end
-    
-    
+
+
     # return bool true iff this file is actually a Jekyll source file
     def read
         # note to self - the better long-term way of doing this is to read the first
         # 4 bytes, look fior '---\n', then read till we have the preamble and parse it,
         # then read the rest, rather than always reading Xk of the file and splitting it
         # up. But this works.
-        
+
         if not File.exists? File.join(self.base, self.filename)
             return false
         end
@@ -41,12 +41,12 @@ class Post
         # but we need to limit to a certain point or we'll slurp in the entirety of every file
         # in the folder.
         content = File.open(File.join(self.base, self.filename), "r") {|f| f.read(500 * 1024) }
-        
+
         if not content
             # 0-length file
             return false
         end
-        
+
         # file must begin with YAML
         preamble = content.split(/---\s*\n/)[1]
         if not preamble
@@ -64,11 +64,11 @@ class Post
         # towards no right now - if you want something clever, do it with a
         # text editor.
         self.body = content.split(/---\s*\n/, 3)[2]
-        
+
         if not self.data["permalink"]
             self.data["permalink"] = "/" + self.filename.gsub(/\/index\.\w+$/,"/")
         end
-        
+
         return true
     end
 
@@ -82,7 +82,7 @@ class Post
         else
             new_filename = self.slug
         end
-        
+
         if self.data["permalink"]
             pm = self.data["permalink"].gsub(/\/index\.\w+$/,"/")
             new_pm = "/" + new_filename.gsub(/\/index\.\w+$/,"/")
@@ -98,7 +98,7 @@ class Post
             # TODO - fix for recursive mkdir
             Dir.mkdir folder
         end
-        
+
         # write a .temp file rather than overwriting the old file, in case something
         # goes wrong. TODO - Write a hidden file to avoid confusing jekyll
         tempname = File.join(self.base, new_filename + ".temp")
@@ -122,23 +122,23 @@ class Post
     def to_s
         return "#<Post (#{self.type}) #{self.filename}>"
     end
-    
-    
+
+
     # some utility accessors to get/set standard values out of the data hash
     def title
         return self.data["title"]
     end
-    
+
     def title=(t)
         self.data["title"] = t
     end
-    
+
     def tags
         return self.data["tags"] || []
     end
-    
+
     def tags=(t)
         self.data["tags"] = t
     end
-    
+
 end
