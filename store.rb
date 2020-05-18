@@ -85,7 +85,7 @@ class Store
     end
 
     def create(type = :page, slug = nil, date = nil)
-        slug ||= (Time.now.to_i * 3).to_s + ".markdown" # TODO - default extension should be configurable
+        slug ||= (Time.now.to_i * 3).to_s + ".md" # TODO - default extension should be configurable
         if type == :page
             return Post.new(self.base, slug)
         else

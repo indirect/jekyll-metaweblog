@@ -27,7 +27,7 @@ class MetaWeblog
 
         # keys should map to file extensions. We rename the file if the filter is changed.
         self.filters = [
-            { "key" => "markdown", "label" => "Markdown" },
+            { "key" => "md", "label" => "Markdown" },
             { "key" => "html", "label" => "HTML" },
         ]
 
