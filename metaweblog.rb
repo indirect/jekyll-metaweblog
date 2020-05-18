@@ -27,7 +27,7 @@ class MetaWeblog
 
         # keys should map to file extensions. We rename the file if the filter is changed.
         self.filters = [
-            { "key" => "md", "label" => "Markdown" },
+            { "key" => "markdown", "label" => "Markdown" },
             { "key" => "html", "label" => "HTML" },
         ]
 
@@ -152,12 +152,13 @@ class MetaWeblog
 
             # have to have _something_
             if not basename.match(/\../) and filter_key == "0"
-                filter_key = "html"
+                filter_key = "markdown"
             end
 
             post.slug = basename
             if filter_key != "0"
-                post.slug = post.slug.gsub(/\./,'') + "." + filter_key
+                ext = filter_key == "markdown" ? "md" : filter_key
+                post.slug = post.slug.gsub(/\./,'') + "." + ext
             end
         end
 

@@ -98,11 +98,11 @@ class TestMetaWeblog < Minitest::Test
         @store.create(:post, "something.html", Date.civil(1999,1,1)).write
         post = @store.get("_posts/1999-01-01-something.html")
         assert_equal("", post.body)
-        assert_equal(nil, post.title)
+        assert_nil(post.title)
 
         @meta.editPost( post.filename, @user, @pass, { "title" => "new title", "description" => "new body" }, true )
 
-        post = @store.get("_posts/1999-01-01-something.html")
+        post = @store.get("_posts/1999-01-01-new-title.html")
         assert_equal("new body\n", post.body)
         assert_equal("new title", post.title)
 
@@ -111,16 +111,16 @@ class TestMetaWeblog < Minitest::Test
         # can change filter, and file is renamed
         @meta.editPost( post.filename, @user, @pass, { "mt_convert_breaks" => "markdown" }, true )
         assert_equal(1, @store.posts.size)
-        assert_nil @store.get("_posts/1999-01-01-something.html")
-        post = @store.get("_posts/1999-01-01-something.markdown")
-        assert_equal("something.markdown", post.slug)
+        assert_nil @store.get("_posts/1999-01-01-new-title.html")
+        post = @store.get("_posts/1999-01-01-new-title.md")
+        assert_equal("new-title.md", post.slug)
 
         # can change slug, and file is renamed
         @meta.editPost( post.filename, @user, @pass, { "mt_basename" => "renamed" }, true )
         assert_equal(1, @store.posts.size)
-        assert_nil @store.get("_posts/1999-01-01-something.markdown")
-        assert post = @store.get("_posts/1999-01-01-renamed.markdown")
-        assert_equal("renamed.markdown", post.slug)
+        assert_nil @store.get("_posts/1999-01-01-something.md")
+        assert post = @store.get("_posts/1999-01-01-renamed.md")
+        assert_equal("renamed.md", post.slug)
 
         # can remove filter and control filename directly
         @meta.editPost( post.filename, @user, @pass, { "mt_basename" => "style.css", "mt_convert_breaks" => "0" }, true )
@@ -133,10 +133,10 @@ class TestMetaWeblog < Minitest::Test
         assert post = @store.get("_posts/1999-01-01-foo.html")
 
         # can change custom fields
-        custom = [ { "key" => "layout", "value" => "base" } ]
+        custom = [ { "key" => "layout", "value" => "custom" } ]
         @meta.editPost( post.filename, @user, @pass, { "custom_fields" => custom }, true )
         post = @store.get(post.filename)
-        assert_equal("base", post.data["layout"])
+        assert_equal("custom", post.data["layout"])
 
         # change tags
         @meta.editPost( post.filename, @user, @pass, { "mt_tags" => "a,c  , b" }, true )
