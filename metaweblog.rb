@@ -16,7 +16,7 @@ require_relative 'monkeypatch'
 
 class MetaWeblog
     attr_accessor :store, :filters, :custom_field_names, :host, :port, :password
-    
+
 
     def initialize(store, host, port, password)
         self.store = store
@@ -30,10 +30,10 @@ class MetaWeblog
             { "key" => "markdown", "label" => "Markdown" },
             { "key" => "html", "label" => "HTML" },
         ]
-        
+
         self.custom_field_names = [ :layout, :textlink, :permalink, :precis ]
     end
-    
+
     # convert a post into a structure that we expect to return from metaweblog. Some repetition
     # here to convince stroppy clients that we really do mean these things. Be careful to not
     # return any nils, XML-RPC can't cope with them.
@@ -47,14 +47,14 @@ class MetaWeblog
             basename = post.slug
             filter_key = "0" # means 'no filter'
         end
-        
+
         # always return _something_ as a title, rather than a blank string. Not totally
         # happy about this, but lots of clients insist on a title.
         title = post.title || ""
         if title.size == 0
             title = post.slug
         end
-        
+
         return {
             :postId => post.filename,
             :title => title,
@@ -70,7 +70,7 @@ class MetaWeblog
             :post_status => "publish",
         }
     end
-    
+
     # wordpress pages have all the stuff posts have, and also some extra things.
     # These must be present, or Marsedit will just dump them in with the posts.
     def page_response(post)
@@ -81,7 +81,7 @@ class MetaWeblog
             :wp_page_template => post.data["layout"] || "",
         })
     end
-    
+
     # return a custom post data structure. Can't just return eveything, because if the
     # client returns it all, it'll overwrite things like the title.
     def custom_fields(post)
@@ -91,8 +91,8 @@ class MetaWeblog
         test.insert(1, {:key => "photo-alt-text", :value => post.photoAltText ? post.photoAltText : ""})
         return test
     end
-    
-    
+
+
     # given a post object, and an incoming metaweblog data structure, populate the post from the data.
     def populate(post, data)
         # we send the slug as the title if there's no title. Don't take it back.
@@ -105,7 +105,7 @@ class MetaWeblog
         end
 
         post.data["link"] = data["link"]
-        
+
         if d = data["dateCreated"]
             if d.instance_of? XMLRPC::DateTime
                 post.date = Date.civil(d.year, d.month, d.day)
@@ -137,8 +137,8 @@ class MetaWeblog
             else
                 basename = post.slug
                 filter_key = "0" # means 'no filter'
-            end 
-            
+            end
+
             if data.include? "mt_basename"
                 basename = data["mt_basename"]
             end
@@ -149,12 +149,12 @@ class MetaWeblog
                     filter_key = "0"
                 end
             end
-            
+
             # have to have _something_
             if not basename.match(/\../) and filter_key == "0"
                 filter_key = "html"
             end
-        
+
             post.slug = basename
             if filter_key != "0"
                 post.slug = post.slug.gsub(/\./,'') + "." + filter_key
@@ -177,9 +177,8 @@ class MetaWeblog
         else
           post.data["layout"] = "post"
         end
-
     end
-    
+
 
     def getPostOrDie(postId)
         post = store.get(postId)
@@ -193,7 +192,7 @@ class MetaWeblog
     # API implementations follow
 
     # Blogger API
- 
+
     # weird method sig, this.
     def deletePost(apikey, postId, user, pass, publish)
         return store.delete(postId)
@@ -201,22 +200,22 @@ class MetaWeblog
 
 
     # Metaweblog API
-    
+
     def getRecentPosts(blogId, user, password, limit)
         posts = store.posts[0,limit.to_i]
         return posts.map{|p| post_response(p) }
     end
-    
+
     def getCategories(blogId, user, password)
         # later blogging engines have actual tag support, and we
         # don't have to fake things with cstegories. I think jekyll has proper
         # category support, though, so it might be worth looking at that some
         # time..
         return []
-        
+
         #return store.posts.map{|p| p.tags }.flatten.uniq
     end
-    
+
     def getPost(postId, username, password, extra = {})
         return post_response(getPostOrDie(postId))
     end
@@ -229,7 +228,8 @@ class MetaWeblog
     end
 
     def newPost(blogId, username, password, data, publish = true)
-        post = store.create(:post, nil, Date.today) # date is just default
+        slug = data['wp_slug'] + '.md' if data.include? 'wp_slug'
+        post = store.create(:post, slug, Date.today) # date is just default
         populate(post, data)
         store.write(post)
         return post.filename
@@ -243,33 +243,33 @@ class MetaWeblog
 
 
 
-    
+
     # MoveableType API
-    
+
     def supportedTextFilters()
         return self.filters
     end
-    
+
     # no categories yet.
 
     def getCategoryList(blogId, user, pass)
         return []
     end
-    
+
     def getPostCategories(postId, user, pass)
         return []
     end
-    
+
     def setPostCategories(postId, user, pass, categories)
         return true
     end
-    
-    
-    
-    
-    
+
+
+
+
+
     # wordpress API
-    
+
     def getPage(blogId, pageId, user, pass)
         page = getPostOrDie(pageId)
         return page_response(page)
@@ -286,7 +286,7 @@ class MetaWeblog
         pages = store.pages[0,limit]
         return pages.map{|p| page_response(p) }
     end
-    
+
     def getTags(blogId, user, pass)
         all_tags = ( store.posts + store.pages ).map{|p| p.tags }.flatten
         grouped = {}
@@ -301,7 +301,7 @@ class MetaWeblog
         }
         return grouped.values
     end
-    
+
     def editPage(blogId, pageId, user, pass, data, publish)
         page = getPostOrDie(pageId)
         populate(page, data)
@@ -315,7 +315,7 @@ class MetaWeblog
         @store.write(page)
         return page.filename
     end
-    
+
     def getUsersBlogs(something, user, pass = nil) # TODO - it's the _first_ param that is optional
         return [
             { :isAdmin => true,
@@ -326,7 +326,7 @@ class MetaWeblog
             }
         ]
     end
-    
+
     # silly. But yes, there are both versions.
     def getUserBlogs(something, user, pass = nil) # TODO - it's the _first_ param that is optional
         return [
@@ -337,7 +337,7 @@ class MetaWeblog
             }
         ]
     end
-    
+
     def getComments(postId, user, pass, extra)
         return []
     end
@@ -369,7 +369,7 @@ def attach_metaweblog_methods(server, options)
         begin
             ret = obj.call(*args)  # call the original service-method
             STDERR.puts "   #{name} returned " + ret.inspect[0,2000]
-        
+
             if ret.inspect.match(/[^\"]nil[^\"]/)
                 STDERR.puts "found a nil in " + ret.inspect
             end
