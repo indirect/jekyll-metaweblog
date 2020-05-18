@@ -173,10 +173,10 @@ class MetaWeblog
         post.data.delete_if { |key, value| key == "photo-alt-text" && value.strip.empty? }
 
         # Change the kind (layout) of the post
-        if not post.photo.nil?
-          post.data["layout"] = "photo-post"
+        if post.photo
+            post.data["layout"] = "photo-post"
         else
-          post.data["layout"] = "post"
+            post.data["layout"] = data["layout"] || post.data["layout"]
         end
     end
 
