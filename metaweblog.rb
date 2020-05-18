@@ -117,16 +117,8 @@ class MetaWeblog
         # As tags are available in the keywords field in MarsEdit
         # discard the mt_tags field and replace its content
         # by the content of mt_keywords.
-        tags = nil
-        if data.include? "mt_keywords"
-            tags ||= []
-            tags += data["mt_keywords"].split(/\s*,\s*/)
-          data["mt_tags"] = tags
-        end
-        if not tags.nil?
-            post.tags = tags.sort.uniq
-        end
-
+        data_tags = data["mt_keywords"] || data["mt_tags"] || ""
+        post.tags = data_tags.split(/\s*,\s*/).sort.uniq
 
         if data.include? "mt_convert_breaks" or data.include? "mt_basename"
             # if the file extension is one of the permitted filters, treat it as a filter
