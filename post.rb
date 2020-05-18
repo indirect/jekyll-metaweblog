@@ -77,7 +77,8 @@ class Post
         # (because the format type is the file extension).
 
         if self.type == :post
-            self.slug = self.title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '') + ".markdown"
+            ext = File.extname(self.filename)
+            self.slug = self.title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '') + ext if self.title
             new_filename = sprintf("_posts/%04d-%02d-%02d-%s", self.date.year, self.date.month, self.date.day, self.slug)
         else
             new_filename = self.slug
